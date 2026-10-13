@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   ArrowRight,
   BookOpen,
+  Check,
   ChevronRight,
   Code2,
   FileText,
@@ -11,10 +12,9 @@ import {
   Search,
   Network,
   Shield,
-  Zap,
+  Sparkles,
 } from 'lucide-react'
 import { gsap } from 'gsap'
-import { Badge } from './components/ui/badge'
 import { Button } from './components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card'
 import { Input } from './components/ui/input'
@@ -27,6 +27,7 @@ import {
   NavigationMenuTrigger,
 } from './components/ui/navigation-menu'
 import { Separator } from './components/ui/separator'
+import { cn } from './lib/utils'
 
 const heroTags = ['Supreme Court', 'Lahore High Court', 'Sindh High Court', 'Federal Shariat Court', 'Islamabad High Court', 'Peshawar High Court']
 const hybridBullets = [
@@ -95,10 +96,7 @@ function CountUp({ value }) {
   const [count, setCount] = useState(value.includes('<') ? value : '0')
 
   useEffect(() => {
-    if (value.includes('<')) {
-      setCount(value)
-      return undefined
-    }
+    if (value.includes('<')) return undefined
 
     const element = ref.current
     if (!element) return undefined
@@ -136,22 +134,66 @@ function CountUp({ value }) {
   return <span ref={ref}>{count}</span>
 }
 
-function CodeWindow({ filename, language, children, className = '' }) {
+function SectionHeading({ eyebrow, title, lead, align = 'center', dark = false }) {
   return (
-    <Card className={`overflow-hidden border-neutral-800 bg-[#1e1e2e] text-neutral-100 shadow-[0_28px_80px_rgba(0,0,0,0.14)] ${className}`.trim()}>
-      <div className="flex items-center justify-between border-b border-white/10 bg-white/5 px-4 py-3 text-xs text-neutral-300">
+    <div className={cn('max-w-3xl', align === 'center' ? 'mx-auto text-center' : 'text-left')}>
+      <div
+        className={cn(
+          'font-mono text-[11px] font-medium uppercase tracking-[0.28em]',
+          dark ? 'text-white/50' : 'text-[#FF2D20]',
+        )}
+      >
+        [ {eyebrow} ]
+      </div>
+      <h2
+        className={cn(
+          'mt-4 text-balance text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-4xl lg:text-[2.9rem]',
+          dark ? 'text-white' : 'text-neutral-950',
+        )}
+      >
+        {title}
+      </h2>
+      {lead ? (
+        <p className={cn('mt-4 text-pretty text-base leading-7 sm:text-lg sm:leading-8', dark ? 'text-white/60' : 'text-neutral-600')}>
+          {lead}
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
+function CodeWindow({ filename, language, children, className = '', tabs = [] }) {
+  return (
+    <div className={cn('code-glow overflow-hidden rounded-xl border border-white/10 bg-[#0d0d0f] text-neutral-100', className)}>
+      <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-2.5">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
-            <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-            <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
-            <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
           </div>
-          <span className="rounded-full bg-white/10 px-2.5 py-1 font-mono text-[11px]">{filename}</span>
+          {tabs.length > 0 ? (
+            <div className="flex items-center gap-1 text-xs">
+              {tabs.map((tab, i) => (
+                <span
+                  key={tab}
+                  className={cn(
+                    'rounded-md px-2.5 py-1 font-mono',
+                    i === 0 ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70',
+                  )}
+                >
+                  {tab}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <span className="rounded-md bg-white/10 px-2.5 py-1 font-mono text-[11px] text-white/80">{filename}</span>
+          )}
         </div>
-        <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/50">{language}</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/35">{language}</span>
       </div>
-      <pre className="overflow-x-auto p-5 text-sm leading-6 text-neutral-200"><code className="font-mono">{children}</code></pre>
-    </Card>
+      <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-6 text-neutral-200"><code>{children}</code></pre>
+    </div>
   )
 }
 
@@ -160,7 +202,7 @@ function SocialIconButton({ href, label, children }) {
     <a
       href={href}
       aria-label={label}
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-950"
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 transition hover:border-white/25 hover:bg-white/10 hover:text-white"
     >
       {children}
     </a>
@@ -237,16 +279,17 @@ return $results->map(fn ($judgment) => [
 ]);`
 
   return (
-    <div className="min-h-screen bg-white text-neutral-950">
-      <header className={`sticky top-0 z-50 border-b border-neutral-200/80 bg-white/90 backdrop-blur-xl transition-shadow ${scrolled ? 'shadow-[0_12px_30px_rgba(0,0,0,0.06)]' : ''}`}>
-        <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          <a href="#top" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B8860B]/10 text-[#B8860B]"><Scale className="h-5 w-5" /></div>
-            <div>
-              <div className="text-sm font-semibold tracking-tight">Mizan AI</div>
-              <div className="text-xs text-neutral-500">Pakistan legal research</div>
-            </div>
-          </a>
+    <div className="min-h-screen bg-[#fbfbfa] font-sans text-neutral-950 antialiased">
+      <header className={`sticky top-0 z-50 transition-all ${scrolled ? 'bg-[#fbfbfa]/85 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl' : 'bg-transparent'}`}>
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+          <div className={`mt-3 flex h-14 items-center justify-between rounded-2xl border px-3 transition-all sm:px-4 ${scrolled ? 'border-neutral-200 bg-white/80' : 'border-transparent'}`}>
+            <a href="#top" className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#FF2D20] text-white shadow-[0_8px_20px_rgba(255,45,32,0.4)]"><Scale className="h-[18px] w-[18px]" /></div>
+              <div className="leading-none">
+                <div className="text-[15px] font-semibold tracking-tight">Mizan AI</div>
+                <div className="mt-0.5 hidden text-[11px] text-neutral-500 sm:block">Pakistan legal research</div>
+              </div>
+            </a>
 
           <NavigationMenu>
             <NavigationMenuList>
@@ -264,140 +307,187 @@ return $results->map(fn ($judgment) => [
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <a href="https://github.com" className="hidden items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50 md:inline-flex">
-              <GitHubMark className="h-4 w-4" /> GitHub
+          <div className="flex items-center gap-1.5">
+            <a href="https://github.com" className="hidden h-10 items-center gap-2 rounded-lg px-3 text-sm font-medium text-neutral-600 transition hover:bg-neutral-900/5 hover:text-neutral-950 md:inline-flex">
+              <GitHubMark className="h-4 w-4" />
+              <span className="font-mono text-xs">85K</span>
             </a>
-            <Button className="px-5" variant="default">Get Early Access</Button>
+            <a href="#" className="hidden text-sm font-medium text-neutral-600 transition hover:text-neutral-950 sm:block">Sign in</a>
+            <Button className="h-10 px-4">Get Early Access</Button>
+          </div>
           </div>
         </div>
       </header>
 
       <main id="top">
-        <section className="mx-auto max-w-[1280px] px-4 pb-20 pt-16 sm:px-6 lg:px-8 lg:pb-28 lg:pt-24">
-          <div className="mx-auto max-w-4xl text-center">
-            <Badge className="mb-6">Now with Hybrid RAG Search</Badge>
-            <h1 className="mx-auto max-w-5xl text-[clamp(2.9rem,6vw,4.75rem)] font-semibold leading-[0.96] tracking-[-0.06em] text-neutral-950">The AI research agent for Pakistani courts and judgments.</h1>
-            <p className="mx-auto mt-6 max-w-3xl text-[clamp(1rem,1.8vw,1.25rem)] leading-8 text-neutral-600">Search 232,000+ judgments across 215 courts. Get structured research memos in seconds.</p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button size="lg" className="min-w-48">Start Researching <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              <Button size="lg" variant="outline" className="min-w-40">Read the Docs <BookOpen className="ml-2 h-4 w-4" /></Button>
+        <section className="laravel-hero-glow relative overflow-hidden">
+          <div className="laravel-grid-bg pointer-events-none absolute inset-0" aria-hidden="true" />
+          <div className="relative mx-auto max-w-[1280px] px-4 pb-14 pt-14 sm:px-6 sm:pt-20 lg:px-8 lg:pb-20 lg:pt-24">
+            <div className="mx-auto max-w-4xl text-center">
+              <a href="#" className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 py-1 pl-1 pr-3 text-xs font-medium text-neutral-700 shadow-sm backdrop-blur transition hover:border-neutral-300">
+                <span className="rounded-full bg-[#FF2D20] px-2.5 py-0.5 text-[11px] font-semibold text-white">New</span>
+                Now with Hybrid RAG Search
+                <ChevronRight className="h-3.5 w-3.5 text-neutral-400" />
+              </a>
+              <h1 className="mx-auto mt-6 max-w-4xl text-balance text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-neutral-950">
+                The AI research agent for <span className="serif-accent font-normal">Pakistani</span> courts and judgments.
+              </h1>
+              <p className="mx-auto mt-6 max-w-2xl text-pretty text-[clamp(1rem,1.8vw,1.2rem)] leading-8 text-neutral-600">Search 232,000+ judgments across 215 courts. Get structured research memos in seconds.</p>
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Button size="lg" className="min-w-52">Start Researching <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <Button size="lg" variant="outline" className="min-w-44">Read the Docs</Button>
+              </div>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[13px] text-neutral-500">
+                <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-600" /> 232,000+ judgments</span>
+                <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-600" /> 215 courts</span>
+                <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-600" /> Under 2s answers</span>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-10 overflow-hidden">
-            <div className="hero-marquee flex items-center gap-4 whitespace-nowrap py-3 text-sm text-neutral-700">
-              {[...heroTags, ...heroTags].map((tag, index) => <span key={`${tag}-${index}`} className="rounded-full border border-neutral-200 bg-white px-4 py-2 shadow-sm">{tag}</span>)}
+            <div className="mt-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+              <div className="hero-marquee flex items-center gap-3 whitespace-nowrap py-2 text-[13px] text-neutral-600">
+                {[...heroTags, ...heroTags].map((tag, index) => (
+                  <span key={`${tag}-${index}`} className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 px-4 py-1.5 shadow-sm backdrop-blur">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#FF2D20]" />{tag}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="float-mockup mt-10 lg:mt-12">
-            <Card className="mx-auto max-w-6xl overflow-hidden border-neutral-200 bg-neutral-50 p-4 shadow-[0_40px_100px_rgba(0,0,0,0.08)] sm:p-6">
-              <div className="rounded-[28px] border border-neutral-200 bg-white p-4 sm:p-6">
-                <div className="flex flex-col gap-4 border-b border-neutral-200 pb-4 lg:flex-row lg:items-center">
-                  <div className="flex flex-1 items-center gap-3 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-3"><Search className="h-4 w-4 text-neutral-500" /><div className="text-sm text-neutral-500">Section 302 PPC death penalty reduction grounds</div></div>
-                  <div className="flex items-center gap-2 text-xs text-neutral-500"><span className="rounded-full bg-[#f7f1df] px-3 py-1 text-[#8d6710]">Hybrid RAG</span><span className="rounded-full bg-neutral-100 px-3 py-1">Live court data</span></div>
+          <div className="float-mockup mt-8 lg:mt-10">
+            <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_40px_120px_rgba(0,0,0,0.12)]">
+              <div className="flex items-center gap-2 border-b border-neutral-100 bg-neutral-50/80 px-4 py-3">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+                <div className="mx-auto w-full max-w-sm rounded-md bg-white px-3 py-1 text-center font-mono text-[11px] text-neutral-400 ring-1 ring-neutral-200">mizan.ai/research</div>
+                <div className="w-10" />
+              </div>
+              <div className="p-4 sm:p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+                  <div className="flex flex-1 items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3"><Search className="h-4 w-4 shrink-0 text-neutral-400" /><div className="truncate font-mono text-[13px] text-neutral-600">Section 302 PPC death penalty reduction grounds</div></div>
+                  <div className="flex items-center gap-2 text-xs"><span className="inline-flex items-center gap-1.5 rounded-full bg-[#FF2D20]/10 px-3 py-1 font-medium text-[#FF2D20]"><Sparkles className="h-3 w-3" />Hybrid RAG</span><span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 font-medium text-emerald-700 ring-1 ring-emerald-200">Live court data</span></div>
                 </div>
-                <div className="mt-5 grid gap-4 lg:grid-cols-3">
+                <div className="mt-4 grid gap-3 lg:grid-cols-3">
                   {[
                     ['Supreme Court of Pakistan', 'Reduction is more likely when intention is not proved beyond doubt and mitigating facts outweigh aggravating ones.'],
                     ['Lahore High Court', 'Judgments emphasize the factual matrix, prior record, and consistency with recent sentencing precedents.'],
                     ['Sindh High Court', 'The reasoning often turns on whether the accused received a fair opportunity to rebut aggravating evidence.'],
                   ].map(([title, text]) => (
-                    <Card key={title} className="border-neutral-200 bg-white"><CardHeader className="p-5 pb-2"><div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-[#8d6710]"><FileText className="h-3.5 w-3.5" />Judgment Result</div><CardTitle className="mt-3 text-base">{title}</CardTitle></CardHeader><CardContent className="p-5 pt-0"><CardDescription>{text}</CardDescription></CardContent></Card>
+                    <Card key={title} className="card-lift rounded-xl border-neutral-200/80 shadow-none"><CardHeader className="p-4 pb-2"><div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#FF2D20]"><FileText className="h-3.5 w-3.5" />Judgment Result</div><CardTitle className="mt-2 text-[15px] leading-snug">{title}</CardTitle></CardHeader><CardContent className="p-4 pt-0"><CardDescription className="text-[13px] leading-6">{text}</CardDescription></CardContent></Card>
                   ))}
                 </div>
               </div>
-            </Card>
+            </div>
+            <p className="mt-4 text-center font-mono text-xs text-neutral-400">Powering ideas for Pakistan&apos;s best &amp; brightest</p>
+          </div>
           </div>
         </section>
 
         <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-          <Reveal className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+          <Reveal className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
             <div>
-              <Badge className="mb-5">Hybrid Search</Badge>
-              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl">Find relevant judgments, not just keyword matches.</h2>
-              <h3 className="mt-4 text-xl font-medium text-neutral-800">Semantic + BM25 hybrid retrieval</h3>
-              <p className="mt-4 max-w-2xl text-lg leading-8 text-neutral-600">Mizan AI understands legal intent, citation patterns, and court language so researchers can get the right answer faster than a plain keyword search.</p>
-              <ul className="mt-6 grid gap-3 text-sm text-neutral-700 sm:grid-cols-2">{hybridBullets.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3"><Icon className="h-4 w-4 text-[#B8860B]" />{label}</li>)}</ul>
-              <div className="mt-6 flex flex-wrap gap-2">{hybridChips.map((chip) => <Badge key={chip}>{chip}</Badge>)}</div>
+              <div className="font-mono text-[11px] font-medium uppercase tracking-[0.28em] text-[#FF2D20]">[ Hybrid Search ]</div>
+              <h2 className="mt-4 max-w-xl text-balance text-3xl font-semibold leading-[1.05] tracking-[-0.03em] text-neutral-950 sm:text-4xl lg:text-[2.75rem]">Find relevant judgments, <span className="serif-accent font-normal">not just</span> keyword matches.</h2>
+              <h3 className="mt-4 text-lg font-medium text-neutral-800">Semantic + BM25 hybrid retrieval</h3>
+              <p className="mt-3 max-w-xl text-base leading-7 text-neutral-600">Mizan AI understands legal intent, citation patterns, and court language so researchers can get the right answer faster than a plain keyword search.</p>
+              <ul className="mt-6 grid gap-2.5 text-sm text-neutral-700 sm:grid-cols-2">{hybridBullets.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-2.5 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 shadow-sm"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FF2D20]/10 text-[#FF2D20]"><Icon className="h-3.5 w-3.5" /></span>{label}</li>)}</ul>
+              <div className="mt-5 flex flex-wrap gap-2">{hybridChips.map((chip) => <span key={chip} className="rounded-md bg-neutral-900/[0.04] px-2.5 py-1 font-mono text-xs text-neutral-600 ring-1 ring-neutral-900/10">{chip}</span>)}</div>
+              <a href="#" className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#FF2D20] hover:gap-2">Explore the framework <ArrowRight className="h-4 w-4" /></a>
             </div>
-            <CodeWindow filename="search.php" language="PHP">{searchQuery}</CodeWindow>
+            <CodeWindow filename="search.php" language="PHP" tabs={['search.php', 'Judgment.php']}>{searchQuery}</CodeWindow>
           </Reveal>
         </section>
 
-        <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-          <Reveal className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-            <CodeWindow filename="memo.json" language="JSON">{researchMemo}</CodeWindow>
+        <section className="border-y border-neutral-200/80 bg-white">
+          <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+          <Reveal className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+            <CodeWindow filename="memo.json" language="JSON" tabs={['memo.json', 'citations.json']}>{researchMemo}</CodeWindow>
             <div>
-              <Badge className="mb-5">Research Memos</Badge>
-              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl">From query to full research memo in one click.</h2>
-              <p className="mt-4 max-w-2xl text-lg leading-8 text-neutral-600">Turn a legal question into a structured memo with issues, applicable law, precedents, contradictions, and a practical recommendation you can build on immediately.</p>
-              <ul className="mt-6 space-y-3 text-sm text-neutral-700">{memoSections.map((item) => <li key={item} className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3"><BookOpen className="h-4 w-4 text-[#B8860B]" />{item}</li>)}</ul>
+              <div className="font-mono text-[11px] font-medium uppercase tracking-[0.28em] text-[#FF2D20]">[ Research Memos ]</div>
+              <h2 className="mt-4 max-w-xl text-balance text-3xl font-semibold leading-[1.05] tracking-[-0.03em] text-neutral-950 sm:text-4xl lg:text-[2.75rem]">From query to full research memo in <span className="serif-accent font-normal">one click.</span></h2>
+              <p className="mt-4 max-w-xl text-base leading-7 text-neutral-600">Turn a legal question into a structured memo with issues, applicable law, precedents, contradictions, and a practical recommendation you can build on immediately.</p>
+              <ul className="mt-6 space-y-2.5 text-sm text-neutral-700">{memoSections.map((item) => <li key={item} className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-[#fbfbfa] px-4 py-3 shadow-sm"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-neutral-900 text-white"><BookOpen className="h-3.5 w-3.5" /></span>{item}<ChevronRight className="ml-auto h-4 w-4 text-neutral-300" /></li>)}</ul>
             </div>
           </Reveal>
+          </div>
         </section>
 
         <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-          <Reveal className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <Reveal className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
             <div>
-              <Badge className="mb-5">Contradiction Detection</Badge>
-              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl">Catch conflicting judgments before they catch you.</h2>
-              <p className="mt-4 max-w-2xl text-lg leading-8 text-neutral-600">Compare judgments side by side, see where benches diverge, and flag material conflicts before you rely on a precedent in court.</p>
+              <div className="font-mono text-[11px] font-medium uppercase tracking-[0.28em] text-[#FF2D20]">[ Contradiction Detection ]</div>
+              <h2 className="mt-4 max-w-xl text-balance text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-4xl lg:text-[2.75rem]">Catch conflicting judgments <span className="serif-accent font-normal">before</span> they catch you.</h2>
+              <p className="mt-4 max-w-xl text-base leading-7 text-neutral-600">Compare judgments side by side, see where benches diverge, and flag material conflicts before you rely on a precedent in court.</p>
+              <div className="mt-6 flex flex-wrap gap-3"><Button>Start Researching <ArrowRight className="ml-2 h-4 w-4" /></Button><Button variant="outline">Read the Docs</Button></div>
             </div>
-            <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
+            <div className="relative grid gap-3 sm:grid-cols-2 sm:items-stretch">
               {[
                 'A later bench held that prior conduct can mitigate sentencing when motive remains unproven.',
                 'An earlier bench treated the same conduct as aggravating and refused reduction.',
-              ].map((text, index) => <Card key={index} className="border-neutral-200 bg-white p-5"><div className="mb-4 flex items-center justify-between"><Badge>Judgment {index + 1}</Badge><span className="text-xs text-neutral-500">Ratio excerpt</span></div><p className="text-sm leading-7 text-neutral-700">{text}</p></Card>)}
-              <div className="mx-auto flex h-14 w-40 items-center justify-center rounded-full border border-red-200 bg-red-50 px-4 text-sm font-medium text-red-700 shadow-sm"><AlertTriangle className="mr-2 h-4 w-4" />Conflict Detected</div>
+              ].map((text, index) => <Card key={index} className="card-lift p-5"><div className="mb-4 flex items-center justify-between"><span className="rounded-full bg-neutral-900 px-2.5 py-1 text-[11px] font-semibold text-white">Judgment {index + 1}</span><span className="font-mono text-[11px] text-neutral-400">Ratio excerpt</span></div><p className="text-sm leading-7 text-neutral-700">{text}</p></Card>)}
+              <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-[#FF2D20]/25 bg-white px-4 py-2 text-xs font-semibold text-[#FF2D20] shadow-[0_12px_32px_rgba(255,45,32,0.25)] sm:inline-flex"><AlertTriangle className="h-3.5 w-3.5" />Conflict Detected</div>
+              <div className="mx-auto inline-flex items-center gap-1.5 rounded-full border border-[#FF2D20]/25 bg-white px-4 py-2 text-xs font-semibold text-[#FF2D20] shadow-sm sm:hidden"><AlertTriangle className="h-3.5 w-3.5" />Conflict Detected</div>
             </div>
           </Reveal>
         </section>
 
-        <section className="border-y border-[#ead9a6] bg-[#f7f1df]"><div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-6 px-4 py-12 text-center sm:px-6 lg:flex-row lg:px-8 lg:text-left"><div><div className="text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl">Research smarter. What will you argue?</div></div><div className="flex flex-col gap-3 sm:flex-row"><Button size="lg">Start Researching</Button><Button size="lg" variant="outline">Read the Docs</Button></div></div></section>
-
-        <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-          <Reveal><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{testimonials.map((item) => <Card key={item.name} className="p-6"><div className="mb-6 text-5xl leading-none text-[#B8860B]">“</div><p className="min-h-28 text-sm leading-7 text-neutral-700">{item.quote}</p><div className="mt-6 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-full bg-neutral-100 text-sm font-semibold text-neutral-700">{item.name.charAt(0)}</div><div><div className="text-sm font-semibold text-neutral-950">{item.name}</div><div className="text-xs text-neutral-500">{item.role} · {item.company}</div></div></div></Card>)}</div></Reveal>
-        </section>
-
-        <section className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-          <Reveal><div className="grid gap-4 rounded-[2rem] border border-neutral-200 bg-neutral-50 p-6 sm:grid-cols-2 xl:grid-cols-4 xl:p-8">{stats.map((item) => <div key={item.label} className="rounded-3xl border border-neutral-200 bg-white p-6 text-center shadow-sm"><div className="text-4xl font-semibold tracking-tight text-neutral-950"><CountUp value={item.value} /></div><div className="mt-2 text-sm text-neutral-600">{item.label}</div></div>)}</div></Reveal>
+        <section className="relative overflow-hidden bg-[#FF2D20]">
+          <div className="laravel-dot-bg absolute inset-0 opacity-[0.12]" aria-hidden="true" />
+          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/15 blur-3xl" aria-hidden="true" />
+          <div className="absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-black/15 blur-3xl" aria-hidden="true" />
+          <div className="relative mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-6 px-4 py-14 text-center sm:px-6 lg:flex-row lg:px-8 lg:text-left">
+            <div>
+              <div className="font-mono text-[11px] font-medium uppercase tracking-[0.28em] text-white/70">[ Create without limits ]</div>
+              <div className="mt-2 text-balance text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl">Research smarter. What will you argue?</div>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row"><a href="#" className="inline-flex h-12 items-center justify-center rounded-lg bg-white px-7 text-[15px] font-semibold text-[#FF2D20] shadow-lg transition hover:-translate-y-px">Start Researching</a><a href="#" className="inline-flex h-12 items-center justify-center rounded-lg border border-white/40 px-7 text-[15px] font-semibold text-white transition hover:-translate-y-px hover:bg-white/10">Read the Docs</a></div>
+          </div>
         </section>
 
         <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <Reveal>
-            <div className="mb-8 flex items-end justify-between gap-4"><div><Badge className="mb-5">Supported Courts</Badge><h2 className="text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl">Coverage built for Pakistan’s core court hierarchy.</h2></div></div>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{courts.map((court) => <Card key={court.name} className="p-6"><div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f7f1df] text-[#8d6710]"><Scale className="h-6 w-6" /></div><h3 className="mt-5 text-lg font-semibold text-neutral-950">{court.name}</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{court.jurisdiction}</p><Separator className="my-5" /><div className="text-xs uppercase tracking-[0.18em] text-neutral-500">Coverage years</div><div className="mt-2 text-sm font-medium text-neutral-800">{court.years}</div></Card>)}</div>
+            <SectionHeading eyebrow="Loved by legal minds" title={<>Trusted by Pakistan&apos;s advocates, researchers &amp; students</>} />
+            <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{testimonials.map((item) => <Card key={item.name} className="card-lift p-6"><div className="serif-accent mb-4 text-4xl leading-none text-[#FF2D20]">“</div><p className="min-h-28 text-[15px] leading-7 text-neutral-700">{item.quote}</p><div className="mt-6 flex items-center gap-3 border-t border-neutral-100 pt-5"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-900 text-sm font-semibold text-white">{item.name.charAt(0)}</div><div><div className="text-sm font-semibold text-neutral-950">{item.name}</div><div className="text-xs text-neutral-500">{item.role} · {item.company}</div></div></div></Card>)}</div></Reveal>
+        </section>
+
+        <section className="mx-auto max-w-[1280px] px-4 pb-4 sm:px-6 lg:px-8">
+          <Reveal><div className="grid gap-px overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-200 shadow-sm sm:grid-cols-2 xl:grid-cols-4">{stats.map((item) => <div key={item.label} className="bg-white p-8 text-center"><div className="text-4xl font-semibold tracking-[-0.02em] text-neutral-950"><CountUp value={item.value} /></div><div className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">{item.label}</div></div>)}</div></Reveal>
+        </section>
+
+        <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+          <Reveal>
+            <div className="mb-10 text-left"><div className="font-mono text-[11px] font-medium uppercase tracking-[0.28em] text-[#FF2D20]">[ Supported Courts ]</div><h2 className="mt-4 max-w-2xl text-balance text-3xl font-semibold leading-[1.05] tracking-[-0.03em] text-neutral-950 sm:text-4xl">Coverage built for Pakistan’s core court hierarchy.</h2></div>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{courts.map((court) => <Card key={court.name} className="card-lift group p-6"><div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FF2D20]/10 text-[#FF2D20] transition group-hover:bg-[#FF2D20] group-hover:text-white"><Scale className="h-5 w-5" /></div><h3 className="mt-5 text-lg font-semibold tracking-tight text-neutral-950">{court.name}</h3><p className="mt-1.5 text-sm leading-6 text-neutral-600">{court.jurisdiction}</p><Separator className="my-5" /><div className="flex items-center justify-between"><div className="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-400">Coverage years</div><div className="text-sm font-semibold text-neutral-800">{court.years}</div></div></Card>)}</div>
           </Reveal>
         </section>
 
         <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <Reveal>
-            <div className="grid gap-8 rounded-[2rem] border border-neutral-200 bg-white p-6 shadow-[0_20px_80px_rgba(0,0,0,0.05)] lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
-              <div><Badge className="mb-5">Early Access</Badge><h2 className="text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl">Stay updated on Mizan AI&apos;s launch.</h2><p className="mt-4 text-base leading-7 text-neutral-600">Get launch updates and product notes as the platform opens up for early users.</p></div>
-              <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]"><Input placeholder="First name" /><Input type="email" placeholder="Email" /><Button className="w-full lg:w-auto" size="lg">Join Waitlist</Button><p className="sm:col-span-2 lg:col-span-3 text-sm text-neutral-500">No spam. Unsubscribe anytime.</p></form>
+            <div className="grid items-center gap-8 rounded-2xl border border-neutral-200 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.07)] sm:p-8 lg:grid-cols-2 lg:p-12">
+              <div><div className="font-mono text-[11px] font-medium uppercase tracking-[0.28em] text-[#FF2D20]">[ Early Access ]</div><h2 className="mt-4 text-balance text-3xl font-semibold leading-[1.05] tracking-[-0.03em] text-neutral-950 sm:text-4xl">Stay updated on Mizan AI&apos;s launch.</h2><p className="mt-4 max-w-md text-base leading-7 text-neutral-600">Get launch updates and product notes as the platform opens up for early users.</p></div>
+              <form className="w-full" onSubmit={(e) => e.preventDefault()}><div className="grid gap-3"><div className="grid gap-3 sm:grid-cols-2"><div><label className="mb-1.5 block text-sm font-medium text-neutral-700">First name</label><Input placeholder="First name" /></div><div><label className="mb-1.5 block text-sm font-medium text-neutral-700">Last name</label><Input placeholder="Last name" /></div></div><div><label className="mb-1.5 block text-sm font-medium text-neutral-700">Email address</label><Input type="email" placeholder="you@example.com" /></div><Button className="w-full" size="lg">Stay updated</Button></div><p className="mt-3 text-center text-[13px] text-neutral-500">No spam. Unsubscribe anytime.</p></form>
             </div>
           </Reveal>
         </section>
       </main>
 
-      <footer className="border-t border-neutral-200 bg-white">
+      <footer className="bg-[#0d0d0f] text-white">
         <div className="mx-auto max-w-[1280px] px-4 py-14 sm:px-6 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr]">
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_1.4fr]">
             <div>
-              <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B8860B]/10 text-[#B8860B]"><Scale className="h-5 w-5" /></div><div><div className="text-sm font-semibold text-neutral-950">Mizan AI</div><div className="text-xs text-neutral-500">Pakistan legal research agent</div></div></div>
-              <p className="mt-4 max-w-md text-sm leading-7 text-neutral-600">A premium research layer for Pakistani legal professionals, designed to surface the right judgment, the right context, and the right argument.</p>
-              <div className="mt-6 flex items-center gap-3 text-neutral-500">
+              <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#FF2D20] text-white"><Scale className="h-5 w-5" /></div><div><div className="text-sm font-semibold text-white">Mizan AI</div><div className="text-xs text-white/50">Pakistan legal research agent</div></div></div>
+              <p className="mt-4 max-w-md text-sm leading-7 text-white/60">A premium research layer for Pakistani legal professionals, designed to surface the right judgment, the right context, and the right argument.</p>
+              <div className="mt-6 flex items-center gap-2.5 text-white/60">
                 <SocialIconButton href="#" label="GitHub"><GitHubMark className="h-4 w-4" /></SocialIconButton>
                 <SocialIconButton href="#" label="X / Twitter"><XMark className="h-4 w-4" /></SocialIconButton>
                 <SocialIconButton href="#" label="LinkedIn"><LinkedInMark className="h-4 w-4" /></SocialIconButton>
               </div>
             </div>
-            <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">{[['Product', ['Platform', 'Features', 'Pricing', 'Launch']], ['Resources', ['Docs', 'Guides', 'API', 'Updates']], ['Legal', ['Privacy', 'Terms', 'Security', 'Status']], ['Community', ['GitHub', 'X / Twitter', 'LinkedIn', 'Contact']]].map(([title, items]) => <div key={title}><div className="text-sm font-semibold text-neutral-950">{title}</div><ul className="mt-4 space-y-3 text-sm text-neutral-600">{items.map((item) => <li key={item}><a href="#" className="transition hover:text-neutral-950">{item}</a></li>)}</ul></div>)}</div>
+            <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">{[['Product', ['Platform', 'Features', 'Pricing', 'Launch']], ['Resources', ['Docs', 'Guides', 'API', 'Updates']], ['Legal', ['Privacy', 'Terms', 'Security', 'Status']], ['Community', ['GitHub', 'X / Twitter', 'LinkedIn', 'Contact']]].map(([title, items]) => <div key={title}><div className="text-sm font-semibold text-white">{title}</div><ul className="mt-4 space-y-3 text-sm text-white/55">{items.map((item) => <li key={item}><a href="#" className="transition hover:text-white">{item}</a></li>)}</ul></div>)}</div>
           </div>
-          <Separator className="my-8" />
-          <div className="flex flex-col gap-2 text-sm text-neutral-500 sm:flex-row sm:items-center sm:justify-between"><div>© 2025 Mizan AI</div><div className="flex flex-wrap gap-4"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Status</a></div></div>
+          <div className="my-8 h-px w-full bg-white/10" />
+          <div className="flex flex-col gap-2 text-sm text-white/45 sm:flex-row sm:items-center sm:justify-between"><div>© 2025 Mizan AI</div><div className="flex flex-wrap gap-5"><a href="#" className="transition hover:text-white">Privacy</a><a href="#" className="transition hover:text-white">Terms</a><a href="#" className="transition hover:text-white">Status</a></div></div>
         </div>
       </footer>
     </div>
