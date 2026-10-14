@@ -6,6 +6,7 @@ import App from './App.jsx'
 import Login from './pages/Login.jsx'
 import Signup from './pages/Signup.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
+import Pricing from './pages/Pricing.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import DashboardLayout from './components/dashboard/DashboardLayout.jsx'
 import Overview from './pages/dashboard/Overview.jsx'
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/pricing" element={<Pricing />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Overview />} />
           <Route path="search" element={<SearchPage />} />

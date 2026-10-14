@@ -304,6 +304,12 @@ return $results->map(fn ($judgment) => [
                   <NavigationMenuContent>{items.map((item) => <NavigationMenuLink key={item} href="#">{item}</NavigationMenuLink>)}</NavigationMenuContent>
                 </NavigationMenuItem>
               ))}
+              <a
+                href="/pricing"
+                className="flex h-10 items-center rounded-lg px-3.5 text-sm font-medium text-neutral-600 transition hover:bg-neutral-900/5 hover:text-neutral-950"
+              >
+                Pricing
+              </a>
             </NavigationMenuList>
           </NavigationMenu>
 
@@ -493,7 +499,7 @@ return $results->map(fn ($judgment) => [
                 <SocialIconButton href="#" label="LinkedIn"><LinkedInMark className="h-4 w-4" /></SocialIconButton>
               </div>
             </div>
-            <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">{[['Product', ['Platform', 'Features', 'Pricing', 'Launch']], ['Resources', ['Docs', 'Guides', 'API', 'Updates']], ['Legal', ['Privacy', 'Terms', 'Security', 'Status']], ['Community', ['GitHub', 'X / Twitter', 'LinkedIn', 'Contact']]].map(([title, items]) => <div key={title}><div className="text-sm font-semibold text-white">{title}</div><ul className="mt-4 space-y-3 text-sm text-white/55">{items.map((item) => <li key={item}><a href="#" className="transition hover:text-white">{item}</a></li>)}</ul></div>)}</div>
+            <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">{[['Product', ['Platform', 'Features', 'Pricing', 'Launch']], ['Resources', ['Docs', 'Guides', 'API', 'Updates']], ['Legal', ['Privacy', 'Terms', 'Security', 'Status']], ['Community', ['GitHub', 'X / Twitter', 'LinkedIn', 'Contact']]].map(([title, items]) => <div key={title}><div className="text-sm font-semibold text-white">{title}</div><ul className="mt-4 space-y-3 text-sm text-white/55">{items.map((item) => <li key={item}>{item === 'Pricing' ? <a href="/pricing" className="transition hover:text-white">{item}</a> : <a href="#" className="transition hover:text-white">{item}</a>}</li>)}</ul></div>)}</div>
           </div>
           <div className="my-8 h-px w-full bg-white/10" />
           <div className="flex flex-col gap-2 text-sm text-white/45 sm:flex-row sm:items-center sm:justify-between"><div>© 2025 Mizan AI</div><div className="flex flex-wrap gap-5"><a href="#" className="transition hover:text-white">Privacy</a><a href="#" className="transition hover:text-white">Terms</a><a href="#" className="transition hover:text-white">Status</a></div></div>
