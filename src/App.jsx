@@ -312,8 +312,17 @@ return $results->map(fn ($judgment) => [
               <GitHubMark className="h-4 w-4" />
               <span className="font-mono text-xs">85K</span>
             </a>
-            <a href="#" className="hidden text-sm font-medium text-neutral-600 transition hover:text-neutral-950 sm:block">Sign in</a>
-            <Button className="h-10 px-4">Get Early Access</Button>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                window.location.href = '/login'
+              }}
+              className="hidden text-sm font-medium text-neutral-600 transition hover:text-neutral-950 sm:block"
+            >
+              Sign in
+            </a>
+            <Button className="h-10 px-4" onClick={() => { window.location.href = '/signup' }}>Get Early Access</Button>
           </div>
           </div>
         </div>
